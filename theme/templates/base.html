@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Budget App{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="font-outfit bg-light text-dark min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-primary text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{% url 'home' %}" class="text-xl font-bold">Budget App</a>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'accounts:dashboard' %}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:text-gray-200">Dashboard</a>
+                        <a href="{% url 'banking:accounts' %}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:text-gray-200">Accounts</a>
+                        <a href="{% url 'budgets:list' %}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:text-gray-200">Budgets</a>
+                        <a href="{% url 'transactions:list' %}" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:text-gray-200">Transactions</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex items-center">
+                    {% if user.is_authenticated %}
+                    <div class="ml-3 relative">
+                        <div class="flex items-center space-x-4">
+                            <a href="{% url 'accounts:profile' %}" class="text-sm font-medium hover:text-gray-200">Profile</a>
+                            <form method="post" action="{% url 'account_logout' %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-sm font-medium hover:text-gray-200">Sign Out</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="space-x-4">
+                        <a href="{% url 'account_login' %}" class="text-sm font-medium hover:text-gray-200">Sign In</a>
+                        <a href="{% url 'account_signup' %}" class="text-sm font-medium hover:text-gray-200">Sign Up</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        {% for message in messages %}
+        <div class="rounded-md p-4 mb-4 {% if message.tags == 'success' %}bg-green-50 text-green-700{% elif message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-blue-50 text-blue-700{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-sm">&copy; {% now "Y" %} Budget App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

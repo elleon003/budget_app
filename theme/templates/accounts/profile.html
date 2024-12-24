@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Budget App{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <h1 class="text-3xl font-bold text-primary">Profile Settings</h1>
+
+    <!-- Profile Form -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold text-primary mb-4">Personal Information</h2>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <p class="mt-1 text-sm text-grey">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                <div class="mt-1">
+                    {% for error in field.errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div class="pt-4">
+                <button type="submit" 
+                        class="w-full bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors">
+                    Update Profile
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Two-Factor Authentication -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-primary">Two-Factor Authentication</h2>
+            <span class="px-3 py-1 rounded-full text-sm font-medium {% if user.two_factor_enabled %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                {% if user.two_factor_enabled %}Enabled{% else %}Disabled{% endif %}
+            </span>
+        </div>
+        {% if user.two_factor_enabled %}
+            <p class="text-grey mb-4">Two-factor authentication is currently enabled for your account.</p>
+            <form method="post" action="{% url 'accounts:2fa_disable' %}">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="w-full bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors">
+                    Disable 2FA
+                </button>
+            </form>
+        {% else %}
+            <p class="text-grey mb-4">Add an extra layer of security to your account by enabling two-factor authentication.</p>
+            <a href="{% url 'accounts:2fa_setup' %}" 
+               class="block w-full bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors text-center">
+                Enable 2FA
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Connected Social Accounts -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold text-primary mb-4">Connected Accounts</h2>
+        <div class="space-y-4">
+            {% get_social_accounts user as accounts %}
+            
+            <!-- Google -->
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <span class="text-lg">Google</span>
+                </div>
+                {% if 'google' in accounts.connected %}
+                    <form method="post" action="{% url 'socialaccount_connections' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="account" value="{{ accounts.google.0.id }}">
+                        <button type="submit" class="text-red-600 hover:text-red-800">Disconnect</button>
+                    </form>
+                {% else %}
+                    <a href="{% provider_login_url 'google' process='connect' %}" 
+                       class="text-primary hover:text-opacity-80">
+                        Connect
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <span class="text-lg">LinkedIn</span>
+                </div>
+                {% if 'linkedin' in accounts.connected %}
+                    <form method="post" action="{% url 'socialaccount_connections' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="account" value="{{ accounts.linkedin.0.id }}">
+                        <button type="submit" class="text-red-600 hover:text-red-800">Disconnect</button>
+                    </form>
+                {% else %}
+                    <a href="{% provider_login_url 'linkedin' process='connect' %}" 
+                       class="text-primary hover:text-opacity-80">
+                        Connect
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Microsoft -->
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <span class="text-lg">Microsoft</span>
+                </div>
+                {% if 'microsoft' in accounts.connected %}
+                    <form method="post" action="{% url 'socialaccount_connections' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="account" value="{{ accounts.microsoft.0.id }}">
+                        <button type="submit" class="text-red-600 hover:text-red-800">Disconnect</button>
+                    </form>
+                {% else %}
+                    <a href="{% provider_login_url 'microsoft' process='connect' %}" 
+                       class="text-primary hover:text-opacity-80">
+                        Connect
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="bg-white p-6 rounded-lg shadow-md border-2 border-red-200">
+        <h2 class="text-xl font-semibold text-red-600 mb-4">Danger Zone</h2>
+        <p class="text-grey mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+        <button type="button" 
+                class="w-full bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors"
+                onclick="if(confirm('Are you sure you want to delete your account? This action cannot be undone.')) document.getElementById('delete-account-form').submit();">
+            Delete Account
+        </button>
+        <form id="delete-account-form" method="post" action="{% url 'account_delete' %}" class="hidden">
+            {% csrf_token %}
+        </form>
+    </div>
+</div>
+{% endblock %}

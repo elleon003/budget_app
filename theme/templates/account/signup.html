@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}{% trans "Sign Up" %} - Budget App{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <h1 class="text-3xl font-bold text-primary mb-8 text-center">{% trans "Sign Up" %}</h1>
+
+    <div class="card space-y-6">
+        {% get_providers as socialaccount_providers %}
+        
+        {% if socialaccount_providers %}
+        <div class="space-y-4">
+            <div class="flex flex-col gap-3">
+                {% for provider in socialaccount_providers %}
+                    <a href="{% provider_login_url provider.id process='login' %}"
+                       class="btn text-center {% if provider.name == 'Google' %}bg-red-500{% elif provider.name == 'Microsoft' %}bg-blue-500{% else %}bg-blue-600{% endif %} text-white hover:bg-opacity-90">
+                        {% trans "Sign up with" %} {{ provider.name }}
+                    </a>
+                {% endfor %}
+            </div>
+            
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">{% trans "Or continue with" %}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form class="signup space-y-4" id="signup_form" method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="rounded-md bg-red-50 p-4">
+                <div class="text-sm text-red-700">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="form-label">{% trans "Email" %}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <div class="mt-1">
+                    {% for error in form.email.errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.first_name.id_for_label }}" class="form-label">{% trans "First Name" %}</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                <div class="mt-1">
+                    {% for error in form.first_name.errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.last_name.id_for_label }}" class="form-label">{% trans "Last Name" %}</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                <div class="mt-1">
+                    {% for error in form.last_name.errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password1.id_for_label }}" class="form-label">{% trans "Password" %}</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                <div class="mt-1">
+                    {% for error in form.password1.errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if form.password1.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ form.password1.help_text|safe }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.password2.id_for_label }}" class="form-label">{% trans "Confirm Password" %}</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                <div class="mt-1">
+                    {% for error in form.password2.errors %}
+                    <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <button type="submit" class="w-full btn btn-primary">{% trans "Sign Up" %}</button>
+        </form>
+
+        <div class="text-center text-sm text-gray-600">
+            {% trans "Already have an account?" %}
+            <a href="{{ login_url }}" class="text-primary hover:text-opacity-80 font-medium">
+                {% trans "Sign in" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

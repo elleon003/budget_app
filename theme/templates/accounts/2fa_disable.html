@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Disable Two-Factor Authentication - Budget App{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <h1 class="text-3xl font-bold text-primary">Disable Two-Factor Authentication</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
+        <div class="space-y-4">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <div class="flex">
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-yellow-800">Warning</h3>
+                        <p class="text-yellow-700">
+                            Disabling two-factor authentication will make your account less secure. 
+                            Are you sure you want to continue?
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-grey">
+                    Two-factor authentication adds an important security layer to your account. 
+                    By disabling it, you'll only need your password to log in, which makes your 
+                    account more vulnerable to unauthorized access.
+                </p>
+
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="flex space-x-4">
+                        <button type="submit" 
+                                class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors">
+                            Disable 2FA
+                        </button>
+                        <a href="{% url 'accounts:profile' %}" 
+                           class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-opacity-90 transition-colors text-center">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-blue-50 p-6 rounded-lg">
+        <h3 class="text-lg font-semibold text-blue-800 mb-2">Security Reminder</h3>
+        <ul class="list-disc list-inside space-y-2 text-blue-700">
+            <li>Two-factor authentication helps protect against unauthorized access</li>
+            <li>Consider keeping 2FA enabled if you handle sensitive financial information</li>
+            <li>You can always re-enable 2FA later if you change your mind</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
